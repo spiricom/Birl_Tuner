@@ -3,7 +3,7 @@
 #include "Yin.h"
 #include "sfx.h"
 #include "Birl.h"
-#include <juce_audio_devices/juce_audio_devices.h>
+
 #include <vector>
 #include <cmath>
 #include <algorithm>

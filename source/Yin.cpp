@@ -3,7 +3,6 @@
 //
 
 #include "Yin.h"
-#include <juce_audio_devices/juce_audio_devices.h>
 
 Yin::Yin(const float rate, const int size, const double thresh)
     : sampleRate(rate), bufferSize(size), threshold(thresh)
@@ -11,7 +10,7 @@ Yin::Yin(const float rate, const int size, const double thresh)
     yinBuffer.resize(bufferSize/2, 0.0f);
 }
 
-float Yin::getPitch(const juce::AudioBuffer<float>& buffer)
+float Yin::getPitch(float* buffer)
 {
     float pitch;
 
@@ -28,7 +27,7 @@ float Yin::getPitch(const juce::AudioBuffer<float>& buffer)
     return pitch;
 }
 
-void Yin::difference (const juce::AudioBuffer<float>& buffer)
+void Yin::difference (float* buffer)
 {
     int tau;
     for (tau = 0; tau < bufferSize/2; tau++) {
@@ -36,7 +35,7 @@ void Yin::difference (const juce::AudioBuffer<float>& buffer)
     }
     for (tau = 1; tau < bufferSize/2; tau++) {
         for (int index = 0; index < bufferSize/2; index++) {
-            const float delta = buffer.getSample (channel, index) - buffer.getSample (channel, index + tau);
+            const float delta = buffer[index] - buffer[ index + tau];
             yinBuffer[tau] += delta * delta;
         }
     }

@@ -5,14 +5,13 @@
 #ifndef YIN_H
 #define YIN_H
 
-#include <juce_audio_devices/juce_audio_devices.h>
 #include <vector>
-constexpr int channel = 0; //use the left channel
+//int channel = 0; //use the left channel
 
 class Yin {
     public:
         Yin(float rate, int size, double thresh);
-        float getPitch(const juce::AudioBuffer<float>& buffer);
+        float getPitch(float* buffer);
 
     private:
         float sampleRate;
@@ -20,7 +19,7 @@ class Yin {
         double threshold;
         std::vector<float> yinBuffer;
 
-        void difference(const juce::AudioBuffer<float>& buffer);
+        void difference(float* buffer);
         void normalizeDifference();
         int absoluteThreshold();
         float parabolicInterpolation(int tauEstimate);

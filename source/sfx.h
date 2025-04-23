@@ -8,7 +8,6 @@
 #include "Tube.h"
 #include "Tuning.h"
 #include "../third_party/LEAF/leaf/leaf.h"
-#include "juce_audio_basics/juce_audio_basics.h"
 
 
 #define SMALL_MEM_SIZE 80328
@@ -66,8 +65,8 @@ void initGlobalSFXObjects(LEAF &leaf);
 void SFXPhysicalModelSetTubeLength(int index, double newLength);
 double SFXPhysicalModelGetTubeLength(int index);
 void SFXPhysicalModelPMAlloc(LEAF &leaf);
-void SFXPhysicalModelPMFrame(juce::AudioBuffer<float>& buffer);
-void SFXPhysicalModelPMTick(float* input);
+float SFXPhysicalModelPMTick();
+float myRandom();
 void SFXPhysicalModelPMFree(void);
 void SFXPhysicalModelSetToneholeRadius(int index, float radius);
 void SFXPhysicalModelSetTonehole(int index, float newValue);

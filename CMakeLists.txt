@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.25)
 
 # This tells cmake we have goodies in the /cmake folder
@@ -13,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # This is the internal name of the project and the name of JUCE's shared code target
 # Note: This cannot have spaces (it may be 2024, but you can't have it all!)
 # Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs display)
-set(PROJECT_NAME "Pamplejuce")
+set(PROJECT_NAME "Birl Tuner")
 
 # Worry not, JUCE's PRODUCT_NAME can have spaces (and is what DAWs will display)
 # You can also just have it be the same thing as PROJECT_NAME
@@ -21,7 +22,7 @@ set(PROJECT_NAME "Pamplejuce")
 #   set(PROJECT_NAME "MyPlugin_v${MAJOR_VERSION}")
 # Doing so enables major versions to show up in IDEs and DAWs as separate plugins
 # allowing you to change parameters and behavior without breaking existing user projects
-set(PRODUCT_NAME "Pamplejuce Demo")
+set(PRODUCT_NAME "Birl Tuner")
 
 # Change me! Used for the MacOS bundle name and Installers
 set(COMPANY_NAME "Pamplejuce Company")
@@ -41,7 +42,6 @@ project(${PROJECT_NAME} VERSION ${CURRENT_VERSION})
 # Locally, you must run `git submodule update --init --recursive` once
 # and later `git submodule update --remote --merge` to keep it up to date
 # On Github Actions, this is done as a part of actions/checkout
-add_subdirectory(JUCE)
 add_subdirectory(third_party/LEAF)
 include_directories(third_party/LEAF/leaf)
 
@@ -56,10 +56,7 @@ add_library(BirlCore STATIC ${CORE_SOURCES})
 target_link_libraries(BirlCore
         PUBLIC
         LEAF
-        juce::juce_graphics
-        juce::juce_core
-        juce::juce_dsp
-        juce::juce_audio_basics
+
 
 )
 

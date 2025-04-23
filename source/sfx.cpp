@@ -37,10 +37,13 @@ float randomCall()
 {
     return 0.0f;
 }
+float myRandom() {
+    return (float) rand() /RAND_MAX;
+}
 
 void initGlobalSFXObjects(LEAF &leaf)
 {
-    LEAF_init(&leaf, 44100.0f, medium_memory, MED_MEM_SIZE, [](){return (float)rand()/RAND_MAX;});
+    LEAF_init(&leaf, 44100.0f, medium_memory, MED_MEM_SIZE, myRandom);
     tMempool_init (&smallPool, small_memory, SMALL_MEM_SIZE, &leaf);
     tMempool_init (&largePool, large_memory, LARGE_MEM_SIZE, &leaf);
 
@@ -255,7 +258,7 @@ void SFXPhysicalModelTune(float fundamental) {
             double g = calcg(i);
             double LSh = (1.0/midiTuning[i]) * effectiveLength;
             double LBh = TONEHOLE_HEIGHT + dH * ((BORE_DIAMETER*BORE_DIAMETER)/(dH*dH)) - 0.45*BORE_DIAMETER;
-            DBG(LBh);
+            //DBG(LBh);
             double z = 0.5 * g * sqrt(1 + 4*(LBh/(g*effectiveLength))) - 0.5*g;
             double correction = (z*LSh);
             double tempy =  (LSh - correction);
@@ -338,12 +341,11 @@ float SFXPhysicalModelInterpolateLinear(float a, float b, float alpha) {
     return (alpha * a) + ((1.0-alpha) * b);
 }
 
-void SFXPhysicalModelPMFrame(juce::AudioBuffer<float>& buffer)
-{
-}
 
 
-void SFXPhysicalModelPMTick(float* input) {
+
+
+float SFXPhysicalModelPMTick() {
     double sample = 0.0f;
     double bellReflected;
     mDrive = birl::controlKnobValues[0][18];
@@ -413,8 +415,7 @@ void SFXPhysicalModelPMTick(float* input) {
     tLinearDelay_tickIn(tubes[numHoles].lower, bellReflected);
 
     sample = tanhf(sample);
-    input[0] = sample;
-    input[1] = sample;
+    return sample;
 }
 
 void SFXPhysicalModelPMFree(void) {

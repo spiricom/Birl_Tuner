@@ -14,6 +14,7 @@
 
 Yin yinz = Yin(44100.0f, 1024, 0.1);
 double tubeLengths[NUM_OF_TONEHOLES+1];
+int buffSize = 1024;
 
 void resetFingers(){
     for (int i = 0; i < NUM_OF_TONEHOLES; i++)
@@ -23,7 +24,7 @@ void resetFingers(){
 }
 
 // runs the physical model for the shortest amount of time that will produce a buffer that can be used to find frequency for a tonehole
-float simulate(juce::AudioBuffer<float>& buffer, int iterations, int numHolesClosed, int numAveraged){
+float simulate(float* buffer, int iterations, int numHolesClosed, int numAveraged){
     resetFingers();
     std::vector<float> freqs(iterations);
 
@@ -36,22 +37,27 @@ float simulate(juce::AudioBuffer<float>& buffer, int iterations, int numHolesClo
         birl::fingers[i] = 1.0f;
     }
 
-    float outputSample[2] = { 0.0f, 0.0f };
-    buffer.clear();
+    //float outputSample[2] = { 0.0f, 0.0f };
+    float outputSample = 0.0f;
+    for (int i = 0; i < buffSize; i++) {
+        buffer[i] = 0.0f;
+    }
     for(int i = 0; i < iterations; i++){
         // buffer.clear (0, 0, buffer.getNumSamples());
         // buffer.clear (1, 0, buffer.getNumSamples());
-        float* leftChannel = buffer.getWritePointer(0);
-        float* rightChannel = buffer.getWritePointer(1);
+        // float* leftChannel = buffer.getWritePointer(0);
+        // float* rightChannel = buffer.getWritePointer(1);
 
-        for(int j = 0; j < buffer.getNumSamples(); j++){
-            outputSample[0] = leftChannel[j];
-            outputSample[1] = rightChannel[j];
+        for(int j = 0; j < buffSize; j++){
+            // outputSample[0] = leftChannel[j];
+            // outputSample[1] = rightChannel[j];
 
-            birl::SFXPhysicalModelPMTick(outputSample);
 
-            buffer.setSample(0, j, outputSample[0]);
-            buffer.setSample(1, j, outputSample[1]);
+
+
+            // buffer.setSample(0, j, outputSample[0]);
+            // buffer.setSample(1, j, outputSample[1]);
+            buffer[j] = birl::SFXPhysicalModelPMTick();
         }
         float pitch = yinz.getPitch (buffer);
         if (pitch > 0.0f) freqs[i] = pitch;
@@ -73,7 +79,8 @@ float simulate(juce::AudioBuffer<float>& buffer, int iterations, int numHolesClo
     return sum / static_cast<float>(numAveraged);
 }
 float* getFreqs(){
-    juce::AudioBuffer<float> buffer(2, 1024);
+    //juce::AudioBuffer<float> buffer(2, 1024);
+    float* buffer = new float[buffSize];
     static float freqs[NUM_OF_TONEHOLES+1];
     for (int i = 0; i < 10; i++){
         float pitch = simulate(buffer, 6, i,3);
@@ -228,7 +235,7 @@ void spsaGradientDescent(const float* desiredFreqs,
 
             if (n % 10 == 0 || n == numIterations)
             {
-                printf("\rIteration %d, Error: %f, Best Error: %f\n", n, currentError, bestError);
+                printf("\rIteration %d of %d, Error: %f, Best Error: %f\n", n, numIterations, currentError, bestError);
                 for (int i = 0; i < 10; i++)
                 {
                     double len = birl::SFXPhysicalModelGetTubeLength(i);
