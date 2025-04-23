@@ -99,7 +99,6 @@ target_include_directories(${BINARY_NAME} PUBLIC  "${LIBRARY_BASE_PATH}/leaf"
         "${LIBRARY_BASE_PATH}/leaf/Inc"
         "${LIBRARY_BASE_PATH}/leaf/Externals")
 
-enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
