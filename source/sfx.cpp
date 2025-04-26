@@ -134,11 +134,11 @@ void SFXPhysicalModelPMAlloc(LEAF &leaf)
 
     outputGain = defaultControlKnobValues[PhysicalModelPM][0];
     noiseGain = defaultControlKnobValues[PhysicalModelPM][20];
-    
+
     fundamental = defaultControlKnobValues[PhysicalModelPM][1];
     tubeIndex = 0;
     numToneholes = defaultControlKnobValues[PhysicalModelPM][2];
-    
+
     breathPressure = 0.0;
     prevBreathPressure = 0.0;
     count = 0;
@@ -147,7 +147,7 @@ void SFXPhysicalModelPMAlloc(LEAF &leaf)
     mDrive = 0.0;
     shaperMix = 0.0;
     sRate_ = leaf.sampleRate;
-    
+
     for (int i = 0; i < MAX_TONEHOLES + 1; i++) {
 //        tubes[i] = initTube(3); // IDK???
         tLinearDelay_init(&tubes[i].upper, 100, 512, &leaf);
@@ -158,17 +158,17 @@ void SFXPhysicalModelPMAlloc(LEAF &leaf)
     tHighpass_initToPool(&dcblocker1, 13.0, &smallPool);
     tHighpass_initToPool(&dcblocker2, 13.0, &smallPool);
     // choice of 13 Hz for cutoff due to translation from DC Blocker to LEAF.
-    
+
     tBiQuad_initToPool(&biquad, &smallPool);
     tBiQuad_setCoefficients(biquad, defaultControlKnobValues[PhysicalModelPM][5], defaultControlKnobValues[PhysicalModelPM][6], defaultControlKnobValues[PhysicalModelPM][7], defaultControlKnobValues[PhysicalModelPM][8], defaultControlKnobValues[PhysicalModelPM][9]);
-    
+
     tSVF_initToPool(&pf1,     SVFTypePeak,      defaultControlKnobValues[PhysicalModelPM][10], defaultControlKnobValues[PhysicalModelPM][11], &smallPool);
     tSVF_initToPool(&pf2,     SVFTypePeak,      defaultControlKnobValues[PhysicalModelPM][12], defaultControlKnobValues[PhysicalModelPM][13], &smallPool);
     tSVF_initToPool(&lp1,     SVFTypeLowpass,   defaultControlKnobValues[PhysicalModelPM][14], defaultControlKnobValues[PhysicalModelPM][15], &smallPool);
     tSVF_initToPool(&lp2,     SVFTypeLowpass,   defaultControlKnobValues[PhysicalModelPM][16], defaultControlKnobValues[PhysicalModelPM][17], &smallPool);
     tSVF_initToPool(&noiseBP, SVFTypeBandpass,  defaultControlKnobValues[PhysicalModelPM][21], defaultControlKnobValues[PhysicalModelPM][22], &smallPool);
 
-    SFXPhysicalModelTune(200.0);
+
 }
 
 void SFXPhysicalModelSetToneholeRadius(int index, float radius) {
@@ -235,7 +235,8 @@ void SFXPhysicalModelCalcTHCoeffs() {
         }
 }
 void SFXPhysicalModelTune(float fundamental) {
-    double effectiveLength = calcLS(fundamental);
+    double lowpassDelay = 0;
+    double effectiveLength = calcLS(fundamental) - lowpassDelay;
     float filterDelay = 0;
     float scale = 1.0f;
 
@@ -270,11 +271,6 @@ void SFXPhysicalModelTune(float fundamental) {
             // if (i == 0) {
             //     tubelengths_[i] -= correction;
             // }
-
-            if (tubeLengths_[i] == 0) {
-                printf("ERROR: Integer delay line lengths clash!!!!! Use a different tuning or try oversampling.\n");
-                //return NULL;
-            }
 
             tubeLengths_[i] = tubeLengths_[i]*scale;
             tLinearDelay_setDelay(tubes[i].upper, tubeLengths_[i]);
@@ -395,7 +391,7 @@ float SFXPhysicalModelPMTick() {
 
     // Reflection = Inversion + gain reduction + lowpass filtering.
     //bell = tSVF_tick(pf2, bell);
-   bell = tSVF_tick(lp2, bell);
+   //bell = tSVF_tick(lp2, bell);
     //bell = tHighpass_tick(dcblocker2, bell);
     //    bell = inputDCFilter(dcBlocker2, bell);
 
@@ -433,6 +429,6 @@ void SFXPhysicalModelPMFree(void) {
     tSVF_free(&lp2);
     tSVF_free(&noiseBP);
 }
-    
-    
+
+
 }

@@ -23,8 +23,10 @@ void resetFingers(){
     }
 }
 
+
 // runs the physical model for the shortest amount of time that will produce a buffer that can be used to find frequency for a tonehole
-float simulate(float* buffer, int iterations, int numHolesClosed, int numAveraged){
+float simulate( int iterations, int numHolesClosed, int numAveraged){
+    float* buffer = new float[buffSize];
     resetFingers();
     std::vector<float> freqs(iterations);
 
@@ -80,10 +82,10 @@ float simulate(float* buffer, int iterations, int numHolesClosed, int numAverage
 }
 float* getFreqs(){
     //juce::AudioBuffer<float> buffer(2, 1024);
-    float* buffer = new float[buffSize];
+
     static float freqs[NUM_OF_TONEHOLES+1];
     for (int i = 0; i < 10; i++){
-        float pitch = simulate(buffer, 6, i,3);
+        float pitch = simulate( 6, i,3);
         freqs[i] = LEAF_frequencyToMidi (pitch);
         //printf ("hole %d: %f \n",i,pitch);
     }
@@ -123,8 +125,20 @@ float* getFreqs(){
         return loss;
     }
 
-void printFreqs()
-{
+    float tuningLoss(const float* desiredFreqs) {
+        float* freqs = getFreqs();
+        float loss = 0.0f;
+        for (int i = 0; i < 10; i++) {
+            if (desiredFreqs[i] > 0.0f && freqs[i] > 0.0f) {
+                float logRatio = log2(freqs[i] / desiredFreqs[i]);
+                float centsDifference = 1200.0f * logRatio;
+                loss += centsDifference * centsDifference;
+            }
+        }
+        return loss;
+
+    }
+void printFreqs(){
     printf("pitches in cents\n");
     const float* freqs = getFreqs();
     for (int i = 0; i < 10; i++)
@@ -156,13 +170,14 @@ void spsaGradientDescent(const float* desiredFreqs,
 {
     // Initialize previous error and velocity for each tube.
     float prevError = std::numeric_limits<float>::max();
+    float bestError = std::numeric_limits<float>::max();
     double velocity[10] = {0.0};
     double bestLengths[10] = {0.0};
 
     // Main optimization loop.
     for (int n = 0; n < numIterations; n++)
     {
-        float bestError = std::numeric_limits<float>::max();
+
 
         // Get current tube lengths.
         double initialLengths[10];
@@ -222,6 +237,7 @@ void spsaGradientDescent(const float* desiredFreqs,
             birl::SFXPhysicalModelSetTubeLength(i, newLength);
         }
 
+
         float currentError = 0.5f*(lossPlus + lossMinus);
         if (currentError < bestError) {
 
@@ -262,7 +278,6 @@ void spsaGradientDescent(const float* desiredFreqs,
 void multiSampleSPSA(const float* desiredFreqs,
                                  float epsilon,
                                  float learningRate,
-                                 float decayFactor,
                                  int numIterations,
                                  float tolerance,
                                  int numSamples,
@@ -352,7 +367,7 @@ void multiSampleSPSA(const float* desiredFreqs,
             for (int i = 0; i < 10; i++)
             {
                 double len = birl::SFXPhysicalModelGetTubeLength(i);
-                printf("Tube %d length: %f, avg gradient: %f", i, len, avgGradient[i]);
+                printf("Tube %d length: %f, avg gradient: %f\n", i, len, avgGradient[i]);
             }
         }
     }

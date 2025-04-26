@@ -45,6 +45,20 @@ project(${PROJECT_NAME} VERSION ${CURRENT_VERSION})
 add_subdirectory(third_party/LEAF)
 include_directories(third_party/LEAF/leaf)
 
+include(FetchContent) # If not included already
+
+FetchContent_Declare(sciplot_content
+        GIT_REPOSITORY https://github.com/sciplot/sciplot.git
+        GIT_TAG master)
+
+FetchContent_GetProperties(sciplot_content)
+if(NOT sciplot_content_POPULATED)
+    FetchContent_MakeAvailable(sciplot_content)
+endif()
+
+include_directories(${sciplot_content_SOURCE_DIR})
+
+
 # 1) Collect just the DSP/tuning code you need
 file(GLOB_RECURSE CORE_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
@@ -56,8 +70,7 @@ add_library(BirlCore STATIC ${CORE_SOURCES})
 target_link_libraries(BirlCore
         PUBLIC
         LEAF
-
-
+        sciplot
 )
 
 # 3) Your sim executable
