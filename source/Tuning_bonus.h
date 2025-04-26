@@ -5,7 +5,7 @@
 #include <cmath>
 //hi test test
 // = {2.519840, 2.244920, 2.000000, 1.887750, 1.681790, 1.498310, 1.334830, 1.259920, 1.122460, 1.000000, 0.9439};
-const double tuning[] = {10.0/4.0, 18.0/8.0, 2.0/1.0, 15.0/8.0, 5.0/3.0, 3.0/2.0, 4.0/3.0, 5.0/4.0, 9.0/8.0, 1.0, 15.0/16.0};
+const double tuning[] = {2.519840, 2.244920, 2.000000, 1.887750, 1.681790, 1.498310, 1.334830, 1.259920, 1.122460, 1.000000, 0.9439};
 // const double tuning[] = {2.0/1.0, 15.0/8.0, 5.0/3.0, 3.0/2.0, 4.0/3.0, 5.0/4.0, 9.0/8.0, 1.0, 15.0/16.0};
 
 // const double tuning[] = {1.8877, 1.6818, 1.4982, 1.3348, 1.2599, 1.224, 1.0, 0.9439, 0.9449};
@@ -28,11 +28,11 @@ const double FICTITIOUS_DUCT = (MINIMUM_CHIMNEY + TONEHOLE_DIAMETER) * pow ((BOR
 
 
 static inline double convertTocm(double samps) {
-    return (samps * (C_cm / (sRate__*OVERSAMPLE)));
+    return (samps * (C_cm / (sRate_*OVERSAMPLE)));
 }
 
 static double convertToSamples(double cm) {
-    return (cm * ((sRate__*OVERSAMPLE) / C_cm));
+    return (cm * ((sRate_*OVERSAMPLE) / C_cm));
 }
 
 
@@ -46,7 +46,7 @@ static double convertToSamples(double cm) {
 
 static double calc_g(int tonehole_number)
 {
-    return tuning[tonehole_number] - 1.0;
+    return tuning[tonehole_number]/tuning[tonehole_number-1] - 1.0;
     // return pow (2.0, (1.0/12.0)) - 1;
 
 }
@@ -192,7 +192,7 @@ static int recut_from_d1(double effective_length) {
 // static double checkTuning(double d1, double dH, double LSh, double lL, double g) {
 //     double LBh = dH * ((d1*d1)/(dH*dH)) - 0.45*d1;
 //     double z = 0.5 * g * sqrt(1 + 4*(LBh/(g*LSh))) - 0.5*g;
-//     return (sRate__*OVERSAMPLE)/(4 * (lL + (z*LSh)));
+//     return (sRate_*OVERSAMPLE)/(4 * (lL + (z*LSh)));
 // }
 
 
