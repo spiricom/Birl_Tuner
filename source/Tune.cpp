@@ -117,7 +117,7 @@ float* getFreqs(){
         // Weighted loss: MSE-like base + spread penalty + max outlier penalty
         float mse = 0.0f;
         for (int i = 0; i < 10; i++){
-            mse += errors[i] * errors[i];
+            mse += std::abs(errors[i]);
         }
         mse /= 10.0f;
 

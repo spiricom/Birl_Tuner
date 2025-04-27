@@ -91,10 +91,10 @@ int main() {
     // Plot GD-adjusted losses (step size = 10)
     // plotLosses(MIN_FUNDAMENTAL, 4, 100, true, "gd_loss_data_cents.csv");
 
-    birl::SFXPhysicalModelTune(392);
+    birl::SFXPhysicalModelTune(200);
     printDiffs(birl::desiredFrequencies, getFreqs());
     // multiSampleSPSA(birl::desiredFrequencies, 1e-3, 0.01, 200, 1e-13, 5, 0.7);
-    spsaGradientDescent(birl::desiredFrequencies, 5e-3, 0.01, 1000, 1e-13, 0.8);
+    spsaGradientDescent(birl::desiredFrequencies, 5e-3, 0.005, 500, 1e-13, 0.8);
     // Print desired vs actual diffs
     for (int i = 0; i < NUM_HOLES; ++i) {
         printf("desired %d: %f\n", i, birl::desiredFrequencies[i]);
